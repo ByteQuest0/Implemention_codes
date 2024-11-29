@@ -1,33 +1,53 @@
-def bellman_ford(graph, src):
-    # Step 1: Initialize distances from src to all vertices as infinity and previous as None
+def bellman_ford_optimized(graph, src):
+    # Step 1: Initialize distances and previous nodes in a single dictionary
     table = {vertex: {'distance': float('inf'), 'previous': None} for vertex in graph}
-    table[src]['distance'] = 0  # Set the distance of the source vertex to 0
+    table[src]['distance'] = 0
 
-    # Step 2: Relax edges |V| - 1 times
-    for _ in range(len(graph) - 1):
+    iteration = 0
+
+    # Step 2: Relax edges |V| - 1 times, with early stopping using relaxation flag
+    for i in range(len(graph) - 1):
+        iteration += 1
+        relaxation = False  # Flag to track if any updates occur in this iteration
         for u in graph:
             for v, weight in graph[u]:
                 if table[u]['distance'] != float('inf') and table[u]['distance'] + weight < table[v]['distance']:
                     table[v]['distance'] = table[u]['distance'] + weight
-                    table[v]['previous'] = u  # Update the previous node for path reconstruction
+                    table[v]['previous'] = u
+                    relaxation = True
+        # If no updates were made, we can break early
+        if not relaxation:
+            break
 
-    # Step 3: Check for negative-weight cycles
-    for u in graph:
-        for v, weight in graph[u]:
-            if table[u]['distance'] != float('inf') and table[u]['distance'] + weight < table[v]['distance']:
-                print("Graph contains a negative weight cycle")
-                return None
+    print(f"number of iteration performed = {iteration}")
+
+    # Step 3: Check for negative-weight cycles only if updates occurred
+    if relaxation:  # Only check for negative cycles if relaxation occurred
+        for u in graph:
+            for v, weight in graph[u]:
+                if table[u]['distance'] != float('inf') and table[u]['distance'] + weight < table[v]['distance']:
+                    print("Graph contains a negative weight cycle")
+                    return None
 
     return table
 
-def print_path(result, target):
+def print_table(table):
+    print("Table of distances and previous nodes:")
+    for vertex, data in table.items():
+        print(f"{vertex}: Distance = {data['distance']}, Previous = {data['previous']}")
+
+def print_path(table, src, dest):
     path = []
-    while target is not None:
-        path.append(target)
-        target = result[target]['previous']
-    return path[::-1]  # Return the reversed path
+    current = dest
+    while current != src:
+        path.append(current)
+        current = table[current]['previous']
+    path.append(src)
+    path.reverse()
+    print(f"Shortest path from {src} to {dest}: {' -> '.join(path)}")
 
 # Example graph
+
 graph = {
     'A': [('F', 3), ('B', 2), ('D', 5)],
     'B': [('E', 1)],
@@ -38,16 +58,13 @@ graph = {
     'F': [('B', -4)],
 }
 
+
+
 # Compute shortest paths from source vertex 'A'
 source = 'A'
-result = bellman_ford(graph, source)
+table = bellman_ford_optimized(graph, source)
 
-if result:
-    print(f"Shortest distances from source vertex {source}:")
-    for vertex, data in result.items():
-        print(f"{vertex}: Distance = {data['distance']}, Previous = {data['previous']}")
-
-    print("\nPaths from source to each vertex:")
-    for vertex in result:
-        path = print_path(result, vertex)
-        print(f"Path to {vertex}: {' -> '.join(path)}")
+if table:
+    print_table(table)
+    # Example: Print the shortest path from A to G
+    print_path(table, source, 'G')
