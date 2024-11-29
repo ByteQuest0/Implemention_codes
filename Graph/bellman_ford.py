@@ -1,7 +1,7 @@
 def bellman_ford_optimized(graph, src):
-    # Step 1: Initialize distances and previous nodes in a single dictionary
-    table = {vertex: {'distance': float('inf'), 'previous': None} for vertex in graph}
-    table[src]['distance'] = 0
+    # Step 1: Initialize costs and previous nodes in a single dictionary
+    table = {vertex: {'cost': float('inf'), 'previous': None} for vertex in graph}
+    table[src]['cost'] = 0
 
     relaxation = False  # Flag to track if any updates occur in this iteration
 
@@ -9,8 +9,8 @@ def bellman_ford_optimized(graph, src):
     for i in range(len(graph) - 1):
         for u in graph:
             for v, weight in graph[u]:
-                if table[u]['distance'] != float('inf') and table[u]['distance'] + weight < table[v]['distance']:
-                    table[v]['distance'] = table[u]['distance'] + weight
+                if table[u]['cost'] != float('inf') and table[u]['cost'] + weight < table[v]['cost']:
+                    table[v]['cost'] = table[u]['cost'] + weight
                     table[v]['previous'] = u
                     relaxation = True
         # If no updates were made, we can break early
@@ -21,7 +21,7 @@ def bellman_ford_optimized(graph, src):
     if relaxation:  # Only check for negative cycles if relaxation occurred
         for u in graph:
             for v, weight in graph[u]:
-                if table[u]['distance'] != float('inf') and table[u]['distance'] + weight < table[v]['distance']:
+                if table[u]['cost'] != float('inf') and table[u]['cost'] + weight < table[v]['cost']:
                     print("Graph contains a negative weight cycle")
                     return None
 
@@ -29,10 +29,9 @@ def bellman_ford_optimized(graph, src):
 
 
 def print_table(table):
-    print("Table of distances and previous nodes:")
+    print("Table of costs and previous nodes:")
     for vertex, data in table.items():
-        print(f"{vertex}: Distance = {data['distance']}, Previous = {data['previous']}")
-
+        print(f"{vertex}: Cost = {data['cost']}, Previous = {data['previous']}")
 
 def print_path(table, src, dest):
     path = []
