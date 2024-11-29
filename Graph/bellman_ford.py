@@ -3,12 +3,10 @@ def bellman_ford_optimized(graph, src):
     table = {vertex: {'distance': float('inf'), 'previous': None} for vertex in graph}
     table[src]['distance'] = 0
 
-    iteration = 0
+    relaxation = False  # Flag to track if any updates occur in this iteration
 
     # Step 2: Relax edges |V| - 1 times, with early stopping using relaxation flag
     for i in range(len(graph) - 1):
-        iteration += 1
-        relaxation = False  # Flag to track if any updates occur in this iteration
         for u in graph:
             for v, weight in graph[u]:
                 if table[u]['distance'] != float('inf') and table[u]['distance'] + weight < table[v]['distance']:
@@ -18,8 +16,6 @@ def bellman_ford_optimized(graph, src):
         # If no updates were made, we can break early
         if not relaxation:
             break
-
-    print(f"number of iteration performed = {iteration}")
 
     # Step 3: Check for negative-weight cycles only if updates occurred
     if relaxation:  # Only check for negative cycles if relaxation occurred
@@ -31,10 +27,12 @@ def bellman_ford_optimized(graph, src):
 
     return table
 
+
 def print_table(table):
     print("Table of distances and previous nodes:")
     for vertex, data in table.items():
         print(f"{vertex}: Distance = {data['distance']}, Previous = {data['previous']}")
+
 
 def print_path(table, src, dest):
     path = []
@@ -45,6 +43,7 @@ def print_path(table, src, dest):
     path.append(src)
     path.reverse()
     print(f"Shortest path from {src} to {dest}: {' -> '.join(path)}")
+
 
 # Example graph
 
@@ -57,8 +56,6 @@ graph = {
     'G': [('D', -1)],
     'F': [('B', -4)],
 }
-
-
 
 # Compute shortest paths from source vertex 'A'
 source = 'A'
