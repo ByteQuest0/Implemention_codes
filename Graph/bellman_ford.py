@@ -1,4 +1,4 @@
-def bellman_ford_optimized(graph, src):
+def bellman_ford(graph, src):
     # Step 1: Initialize costs and previous nodes in a single dictionary
     table = {vertex: {'cost': float('inf'), 'previous': None} for vertex in graph}
     table[src]['cost'] = 0
@@ -33,6 +33,7 @@ def print_table(table):
     for vertex, data in table.items():
         print(f"{vertex}: Cost = {data['cost']}, Previous = {data['previous']}")
 
+
 def print_path(table, src, dest):
     path = []
     current = dest
@@ -45,22 +46,22 @@ def print_path(table, src, dest):
 
 
 # Example graph
-
-graph = {
+graph_example = {
     'A': [('F', 3), ('B', 2), ('D', 5)],
     'B': [('E', 1)],
+    'C': [('B', 7), ('G', 4)],
     'D': [('E', 1)],
     'E': [('C', -3), ('G', 3)],
-    'C': [('B', 7), ('G', 4)],
-    'G': [('D', -1)],
     'F': [('B', -4)],
+    'G': [('D', -1)],
+
 }
 
-# Compute shortest paths from source vertex 'A'
+# Compute the shortest paths from source vertex 'A'
 source = 'A'
-table = bellman_ford_optimized(graph, source)
+output_table = bellman_ford(graph_example, source)
 
-if table:
-    print_table(table)
+if output_table:
+    print_table(output_table)
     # Example: Print the shortest path from A to G
-    print_path(table, source, 'G')
+    print_path(output_table, source, 'G')
